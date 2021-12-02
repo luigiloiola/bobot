@@ -86,7 +86,7 @@ while True:
     slp(3)
     pos = imagesearch(r'C:\bombcrypto\images\erro.png')
     if pos == [-1,-1]:
-        # open_heroes()
+        open_heroes()
         for i in range(2):
             work(work_y)
             drag()
