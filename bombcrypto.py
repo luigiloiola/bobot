@@ -5,7 +5,7 @@ from python_imagesearch.imagesearch import imagesearch, imagesearch_loop
 import os
 import cv2 as cv
 import numpy as np
-from random import randrange
+from random import uniform as randunifom
 
 
 
@@ -59,7 +59,7 @@ def bypass_captcha():
     drag_dist = dist_target * dist_barrinha / dist_total_peca
 
     pyautogui.moveTo(inicio[0], inicio[1])
-    pyautogui.drag(drag_dist + 3, 0, button='left', duration=randrange(1,3), tween= pyautogui.easeOutElastic)
+    pyautogui.drag(drag_dist + 3, 0, button='left', duration=randunifom(2,5), tween= pyautogui.easeOutElastic)
 
     slp(1)
     pos = imagesearch(r'C:\bombcrypto\images\are you a robot.png')
@@ -75,7 +75,7 @@ def open_heroes():
     pyautogui.click()
     slp(1.2)
     pyautogui.click()
-    slp(randrange(1,3))
+    slp(randunifom(1,3))
     pos = imagesearch(r'C:\bombcrypto\images\are you a robot.png')
     if pos != [-1,-1]:
         bypass_captcha()
@@ -119,6 +119,13 @@ def connect_to_wallet():
     slp(2)
     pyautogui.moveTo(pos[0], pos[1])
     pyautogui.click()
+    slp(randunifom(2,10))
+    pos = imagesearch(r'C:\bombcrypto\images\connection_timeout.png')
+    if pos != [-1,-1]:
+        pyautogui.moveTo(pos[0], pos[1], duration=randunifom(1,3), tween=pyautogui.easeOutQuad())
+        pyautogui.click()
+        connect_to_wallet()
+
     pos = imagesearch_loop(r'C:\bombcrypto\images\treasure hunt.png',1)
     slp(0.2)
     pyautogui.click(x=pos[0], y=pos[1])
@@ -148,13 +155,14 @@ def work_drag():
 
 #checa por erros a cada 1 min
 def check_for_error():
-    i = 1
+    i = 5
     print('cheking for errors ----- i=1')
     while i > 0:
         print('cheking for errors')
         i -= 1
         pos = imagesearch(r'C:\bombcrypto\images\erro.png')
-        if pos != [-1, -1]:
+        idle = imagesearch(r'C:\bombcrypto\images\idle.png')
+        if pos != [-1, -1] and idle != [-1,-1]:
             i = 0
             return True
         else:
@@ -165,6 +173,36 @@ def check_for_error():
                 return True
             else:
                 slp(600)
+
+
+def error(erro):
+    print('tela de erro')
+    pyautogui.moveTo(erro[0], erro[1])
+    pyautogui.move(22, 130)
+    slp(5)
+    pyautogui.click()
+
+    connect_to_wallet()
+    if login_time_expired() == False:
+        pos = imagesearch(r'C:\bombcrypto\images\are you a robot.png')
+        if pos != [-1, -1]:
+            bypass_captcha()
+            connect_to_wallet()
+            if check_for_error() == True:
+                main()
+
+
+    else:
+        open_heroes()
+        for i in range(3):
+            work_drag()
+
+        slp(1)
+        pyautogui.click(x=1025, y=364)
+        slp(1)
+        pyautogui.click()
+        if check_for_error() == True:
+            main()
 
 def main():
 
@@ -177,8 +215,9 @@ def main():
     while True:
 
         slp(3)
-        pos = imagesearch(r'C:\bombcrypto\images\erro.png')
-        if pos == [-1, -1]:
+        unknown = imagesearch(r'C:\bombcrypto\images\erro.png')
+        idle = imagesearch(r'C:\bombcrypto\images\idle.png')
+        if unknown == [-1, -1] and idle == [-1,-1]:
             open_heroes()
             for i in range(3):
                 work_drag()
@@ -186,36 +225,22 @@ def main():
             x_work = imagesearch(r'C:\bombcrypto\images\x work.png')
             slp(1)
             pyautogui.click(x=x_work[0], y=x_work[1])
-            slp(1)
+            slp(4)
+            print('line 190')
+            pyautogui.move(randunifom(-25,25), randunifom(-25,25))
+            pyautogui.click()
+            print('line192')
+            slp(2)
             pyautogui.click()
             if check_for_error() == True:
                 main()
 
 
+        elif idle != [-1,-1]:
+            error(idle)
+
         else:
-            print('tela de erro')
-            pyautogui.moveTo(pos[0], pos[1])
-            pyautogui.move(22, 130)
-            slp(5)
-            pyautogui.click()
-
-            connect_to_wallet()
-            if login_time_expired() == False:
-                pos = imagesearch(r'C:\bombcrypto\images\are you a robot.png')
-
-            else:
-                connect_to_wallet()
-                pyautogui.click(x=987, y=555)
-                open_heroes()
-                for i in range(3):
-                    work_drag()
-
-                slp(1)
-                pyautogui.click(x=1025, y=364)
-                slp(1)
-                pyautogui.click()
-                if check_for_error() == True:
-                    main()
+            error(unknown)
 
 if __name__ == '__main__':
     main()
